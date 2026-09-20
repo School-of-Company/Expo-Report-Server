@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: expo-report-server
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:35432}/${POSTGRES_DB:expo_report}
+    username: ${POSTGRES_USER:expo}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  security:
+    user:
+      name: ${LOCAL_SECURITY_USER:developer}
+      password: ${LOCAL_SECURITY_PASSWORD}
+
+server:
+  address: 127.0.0.1
+  port: ${SERVER_PORT:8083}
+
+eureka:
+  client:
+    enabled: false
