@@ -1,0 +1,28 @@
+package team.startup.report.domain.excel.service.impl
+
+import org.springframework.stereotype.Service
+import team.startup.report.domain.excel.service.ExcelFile
+import team.startup.report.domain.excel.service.ReportSource
+import team.startup.report.domain.excel.service.TraineeInfoToExcelService
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+/** GET /excel/{expo_id} */
+@Service
+class TraineeInfoToExcelServiceImpl(
+    private val source: ReportSource,
+) : TraineeInfoToExcelService {
+    override fun execute(expoId: String): ExcelFile =
+        wrapExcelFailure({ "예상치 못한 오류 발생" }) {
+            val trainees = source.trainees(expoId) ?: error("박람회 없음")
+            check(trainees.isNotEmpty()) { "연수자가 존재하지 않습니다." }
+            val timestamp = LocalDateTime.now(SEOUL).format(TIMESTAMP)
+            ExcelFile("attachment; filename=\"교원연수자_정보_$timestamp.xlsx\"", renderTrainees(trainees))
+        }
+
+    private companion object {
+        val SEOUL: ZoneId = ZoneId.of("Asia/Seoul")
+        val TIMESTAMP: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+    }
+}
