@@ -78,6 +78,51 @@ class ExcelRenderersTests :
             sheet.cell(1, 7).cellStyle.fillPattern shouldBe FillPatternType.NO_FILL
         }
 
+        "일반 참가자: v1 sanitizeJson처럼 동적 열 제목·값의 줄바꿈(CRLF·LF)은 공백 하나, 고정 열은 그대로" {
+            val sheet =
+                read(
+                    renderStandardParticipants(
+                        listOf(
+                            StandardParticipant(
+                                "홍\n길동",
+                                "010",
+                                true,
+                                ApplicationType.PRE,
+                                linkedMapOf("주소\n상세" to "광주\r\n북구", "a\nb" to "앞", "a b" to "뒤"),
+                                linkedMapOf("의견" to "좋아요\n다음에도", "점수" to 5),
+                            ),
+                        ),
+                    ),
+                ).getSheet("박람회 참가자 정보")
+
+            // 정규화 후 겹친 제목은 한 열이고, MappedAnswers처럼 앞(order가 앞선) 값을 쓴다
+            sheet.values() shouldBe
+                listOf(
+                    listOf("이름", "전화번호", "개인정보 동의 여부", "신청 방식", "주소 상세", "a b", "의견", "점수"),
+                    listOf("홍\n길동", "010", "동의", "사전 등록", "광주 북구", "앞", "좋아요 다음에도", "5"),
+                )
+        }
+
+        "일반 참가자: 홀로 있는 CR·탭은 v1에서 행이 비던 결함이라 재현하지 않고 그대로 둔다" {
+            val sheet =
+                read(
+                    renderStandardParticipants(
+                        listOf(
+                            StandardParticipant(
+                                "홍길동",
+                                "010",
+                                true,
+                                ApplicationType.PRE,
+                                linkedMapOf("메모" to "x\ry", "비고" to "x\ty"),
+                                emptyMap(),
+                            ),
+                        ),
+                    ),
+                ).getSheet("박람회 참가자 정보")
+
+            sheet.values()[1].takeLast(2) shouldBe listOf("x\ry", "x\ty")
+        }
+
         "연수자: v1 열·safe 정리·공통/선택 강연" {
             val sheet =
                 read(

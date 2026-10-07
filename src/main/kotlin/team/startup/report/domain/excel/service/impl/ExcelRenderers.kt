@@ -37,12 +37,14 @@ fun renderStandardParticipants(participants: List<StandardParticipant>): SXSSFWo
     val headerStyle = darkHeaderStyle(workbook)
     val bodyStyle = workbook.createCellStyle().apply { thinBorders() }
 
+    val answers = participants.map { it.information.oneLine() to it.surveyAnswer.oneLine() }
     // v1: 신청 폼 열은 첫 참가자의 키만, 설문 열은 전체 참가자 키의 합집합
-    val infoKeys = participants.first().information.keys
-    val surveyKeys = participants.flatMapTo(LinkedHashSet()) { it.surveyAnswer.keys }
+    val infoKeys = answers.first().first.keys
+    val surveyKeys = answers.flatMapTo(LinkedHashSet()) { it.second.keys }
 
     sheet.writeRow(0, listOf("이름", "전화번호", "개인정보 동의 여부", "신청 방식") + infoKeys + surveyKeys, headerStyle)
     participants.forEachIndexed { index, participant ->
+        val (information, surveyAnswer) = answers[index]
         sheet.writeRow(
             index + 1,
             listOf(
@@ -50,8 +52,8 @@ fun renderStandardParticipants(participants: List<StandardParticipant>): SXSSFWo
                 participant.phoneNumber,
                 consent(participant.personalInformationStatus),
                 participant.applicationType.koreanName,
-            ) + infoKeys.map { participant.information[it]?.toString() ?: "" } +
-                surveyKeys.map { participant.surveyAnswer[it]?.toString() ?: "" },
+            ) + infoKeys.map { information[it] ?: "" } +
+                surveyKeys.map { surveyAnswer[it] ?: "" },
             bodyStyle,
         )
     }
@@ -373,6 +375,17 @@ private fun Sheet.writeRow(
 }
 
 private fun consent(status: Boolean?) = if (status == true) "동의" else "미동의"
+
+private val LINE_BREAK = Regex("\r?\n")
+
+/**
+ * v1 sanitizeJson: 원본 JSON의 줄바꿈(CRLF·LF)을 공백 하나로 바꾼 뒤 파싱했다. 값은 v1 String.valueOf처럼 문자열로 만든다.
+ * 바꾼 뒤 제목이 겹치면 MappedAnswers의 같은 제목 규칙처럼 앞(order가 앞선) 값을 쓴다. 홀로 있는 \r은 v1에서 행 전체가 비던 결함이라 그대로 둔다.
+ */
+private fun Map<String, Any?>.oneLine(): Map<String, String?> =
+    LinkedHashMap<String, String?>().also { result ->
+        forEach { (key, value) -> result.putIfAbsent(key.replace(LINE_BREAK, " "), value?.toString()?.replace(LINE_BREAK, " ")) }
+    }
 
 private fun String?.containsAny(words: List<String>) = this != null && words.any { contains(it) }
 
