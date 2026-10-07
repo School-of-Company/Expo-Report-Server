@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.security.config.Customizer.withDefaults
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -83,19 +82,6 @@ class ExcelSecurityConfig(
             }
         return http.build()
     }
-
-    /**
-     * ponytail: 사용자 정의 체인이 생기면 Boot 기본 체인이 사라지므로 나머지 경로에 Boot 기본과 같은 규칙을 둔다.
-     * fix/5-actuator-security의 SecurityConfig가 머지되면 이 빈을 지운다(전체 매칭 체인이 둘이면 기동 실패로 드러난다).
-     */
-    @Bean
-    @Order(2)
-    fun defaultSecurityFilterChain(http: HttpSecurity): SecurityFilterChain =
-        http
-            .authorizeHttpRequests { it.anyRequest().authenticated() }
-            .formLogin(withDefaults())
-            .httpBasic(withDefaults())
-            .build()
 
     private fun jwtDecoder(): JwtDecoder {
         val pem =

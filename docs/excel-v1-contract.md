@@ -65,7 +65,7 @@
 
 - `JWT_PUBLIC_KEY`(RS256 SPKI PEM)로 서명을 검증한다. `role` 클레임이 `ROLE_ADMIN`이어야 하고, `sub`는 숫자, 수명은 15분 이하(Expo-Expo-Server와 같은 규칙)다. `X-User-Id`, `X-User-Role` 헤더는 무시한다.
 - Gateway 설정(Config-Server `gateway-*.yml`)에는 `/excel`·`/stat` → `expo-report-server`가 이미 있다. 운영 반영 여부는 확인하지 못했다. `/stat`은 이번 범위가 아니다.
-- `/excel` 밖의 경로는 Boot 기본과 같은 규칙(인증 필요)의 대체 체인이 맡는다. `fix/5-actuator-security`의 `SecurityConfig`가 머지되면 `ExcelSecurityConfig.defaultSecurityFilterChain`을 지워야 한다(남겨 두면 전체 매칭 체인이 둘이라 기동에 실패하므로 바로 드러난다).
+- `/excel` 밖의 경로는 `SecurityConfig`의 체인이 맡는다(모니터링 GET만 익명 허용, 나머지는 인증 필요).
 
 ## 머지·배포 조건
 

@@ -5,6 +5,9 @@ import io.kotest.matchers.string.shouldContain
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import team.startup.report.support.TestJwt
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -66,4 +69,12 @@ class SecurityConfigTests {
                 .build(),
             HttpResponse.BodyHandlers.ofString(),
         )
+
+    companion object {
+        @JvmStatic
+        @DynamicPropertySource
+        fun jwt(registry: DynamicPropertyRegistry) {
+            registry.add("JWT_PUBLIC_KEY") { TestJwt.publicKeyPem }
+        }
+    }
 }
