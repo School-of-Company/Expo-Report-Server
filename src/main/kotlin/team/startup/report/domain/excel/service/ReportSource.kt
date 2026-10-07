@@ -33,7 +33,7 @@ enum class TrainingCategory { ESSENTIAL, CHOICE }
 
 /**
  * ReportSource 응답 DTO. 엑셀 한 행의 원천 데이터. 동적 답변(information, surveyAnswer)은 키가 문항 제목이고 순서가 보존된 맵이다.
- * 문항 ID → 제목 복원은 공급자 스냅샷 계약(Expo-User-Server#43) 확정 후 어댑터가 맡는다.
+ * 공급자 답변은 [informationAnswers]·[surveyAnswers]로 제출 당시 문항 스냅샷 기준의 제목·표시 문자열로 바꿔 넣는다.
  */
 data class StandardParticipant(
     val name: String?,
