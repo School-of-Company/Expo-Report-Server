@@ -20,6 +20,8 @@ JPA 플러그인(noArg 포함), allOpen, kapt을 적용했습니다. 별도 anno
 ```bash
 cp .env.example .env
 # .env의 로컬 계정과 포트를 필요에 맞게 수정
+# JWT_PUBLIC_KEY: 로컬 Expo-User-Server의 JWT_PRIVATE_KEY에서 공개키를 뽑아 넣는다(비어 있으면 기동 실패)
+#   openssl pkey -in user-private.pem -pubout | awk 'NF {printf "%s\\n", $0}'
 chmod 600 .env
 docker compose up -d --wait
 ./gradlew bootRun
@@ -35,6 +37,8 @@ Eureka 등록은 기본적으로 비활성화합니다.
 Flyway를 사용하며 스키마 변경은 `src/main/resources/db/migration`에 추가합니다.
 아직 엔티티와 마이그레이션은 없습니다. JPA는 `ddl-auto: validate`로 실행합니다.
 운영 환경은 별도 DB·보안·서비스 디스커버리 설정이 필요합니다.
+dev·prod 배포 환경에도 `JWT_PUBLIC_KEY`를 넣어야 합니다(Config-Server `report-*.yml`에는 아직 없음).
+`/excel` 원천 데이터 연동 전에는 develop·main 머지(자동 배포)를 하지 않습니다. 자세한 조건은 `docs/excel-v1-contract.md`.
 
 ```bash
 # CI와 같은 검증 (PostgreSQL이 실행 중이어야 함)
