@@ -103,6 +103,26 @@ class ExcelRenderersTests :
                 )
         }
 
+        "일반 참가자: 홀로 있는 CR·탭은 v1에서 행이 비던 결함이라 재현하지 않고 그대로 둔다" {
+            val sheet =
+                read(
+                    renderStandardParticipants(
+                        listOf(
+                            StandardParticipant(
+                                "홍길동",
+                                "010",
+                                true,
+                                ApplicationType.PRE,
+                                linkedMapOf("메모" to "x\ry", "비고" to "x\ty"),
+                                emptyMap(),
+                            ),
+                        ),
+                    ),
+                ).getSheet("박람회 참가자 정보")
+
+            sheet.values()[1].takeLast(2) shouldBe listOf("x\ry", "x\ty")
+        }
+
         "연수자: v1 열·safe 정리·공통/선택 강연" {
             val sheet =
                 read(
