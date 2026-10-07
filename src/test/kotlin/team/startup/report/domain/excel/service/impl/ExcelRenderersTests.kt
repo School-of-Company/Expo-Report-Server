@@ -10,8 +10,6 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
-import org.apache.poi.xssf.usermodel.XSSFCell
-import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import team.startup.report.domain.excel.service.ApplicationType
 import team.startup.report.domain.excel.service.ProgramParticipant
@@ -20,6 +18,11 @@ import team.startup.report.domain.excel.service.Trainee
 import team.startup.report.domain.excel.service.TraineeAttendance
 import team.startup.report.domain.excel.service.TrainingCategory
 import team.startup.report.domain.excel.service.TrainingProgram
+import team.startup.report.support.assertDarkHeader
+import team.startup.report.support.assertThinBorders
+import team.startup.report.support.cell
+import team.startup.report.support.rgbFill
+import team.startup.report.support.values
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
@@ -283,40 +286,6 @@ private fun read(workbook: SXSSFWorkbook): XSSFWorkbook {
     return XSSFWorkbook(ByteArrayInputStream(bytes))
 }
 
-private fun Sheet.cell(
-    row: Int,
-    column: Int,
-) = getRow(row).getCell(column) as XSSFCell
-
-/** 행별 셀 값. 빈 셀(BLANK)은 null, 숫자는 Double 문자열 */
-private fun Sheet.values(): List<List<String?>> =
-    map { row ->
-        (0 until row.lastCellNum).map { column ->
-            val cell = row.getCell(column)
-            when (cell?.cellType) {
-                null, CellType.BLANK -> null
-                CellType.NUMERIC -> cell.numericCellValue.toString()
-                else -> cell.stringCellValue
-            }
-        }
-    }
-
 private fun Sheet.rowNums() = map { it.rowNum }
 
 private fun Sheet.rowHeights() = map { it.heightInPoints }
-
-private fun XSSFCellStyle.rgbFill() = fillForegroundXSSFColor?.argbHex?.takeLast(6)
-
-private fun XSSFCellStyle.assertThinBorders() {
-    listOf(borderTop, borderBottom, borderLeft, borderRight).forEach { it shouldBe BorderStyle.THIN }
-}
-
-private fun XSSFCell.assertDarkHeader() {
-    val style = getCellStyle()
-    style.rgbFill() shouldBe "222529"
-    style.fillPattern shouldBe FillPatternType.SOLID_FOREGROUND
-    style.font.bold shouldBe true
-    style.font.xssfColor.argbHex
-        .takeLast(6) shouldBe "FFFFFF"
-    style.assertThinBorders()
-}
