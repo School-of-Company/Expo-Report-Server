@@ -23,3 +23,17 @@ server:
 eureka:
   client:
     enabled: false
+
+# 엑셀 원천 공급자 내부 API. 주소·토큰은 기본값 없이 비어 있으면 기동에 실패한다.
+clients:
+  connect-timeout: ${CLIENT_CONNECT_TIMEOUT:3s}
+  read-timeout: ${CLIENT_READ_TIMEOUT:10s}
+  user:
+    url: ${USER_SERVICE_URL}
+    internal-token: ${USER_INTERNAL_TOKEN}
+  application:
+    url: ${APPLICATION_SERVICE_URL}
+    internal-token: ${APPLICATION_INTERNAL_TOKEN}
+  expo:
+    url: ${EXPO_SERVICE_URL}
+    internal-token: ${EXPO_INTERNAL_TOKEN}
