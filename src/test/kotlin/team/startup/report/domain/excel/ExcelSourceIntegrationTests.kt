@@ -102,7 +102,7 @@ class ExcelSourceIntegrationTests {
         sheet.values() shouldBe
             listOf(
                 listOf("이름", "전화번호", "개인정보 동의 여부", "신청 방식", "학교명", "관심분야", "만족도", "재방문"),
-                listOf("참가자2", "010-0000-0002", "동의", "사전 등록", "가초", "AI, 로봇", "좋음", "true"),
+                listOf("참가자2", "010-0000-0002", "동의", "사전 등록", "가초", "AI, 로 봇", "좋음", "true"),
                 listOf("참가자5", "010-0000-0005", "미동의", "현장 등록", "나초", "", "", ""),
                 listOf("참가자7", "010-0000-0007", "동의", "사전 등록", "다초", "", "", ""),
             )
@@ -450,7 +450,7 @@ private fun standard2() =
         info(
             mapOf("관심분야" to listOf("k1", "k2"), "학교명" to "가초"),
             listOf(
-                question("q1", "관심분야", 2, "MULTIPLE", mapOf("k1" to "AI", "k2" to mapOf("value" to "로봇"))),
+                question("q1", "관심분야", 2, "MULTIPLE", mapOf("k1" to "AI", "k2" to mapOf("value" to "로\n봇"))),
                 question("q0", "학교명", 1, "SENTENCE"),
             ),
         ),
